@@ -1,0 +1,17 @@
+{
+  "name": "project",
+  "version": "1.0.0",
+  "description": "A project on predicting whether it will rain tomorrow or not by using the Rainfall in Australia dataset\r This project is tested over lot of ml models like catboost, xgboost, random forest, support vector classifier, etc..\r Out of these models catboost performed very well giving an AUC score around and ROC score of 89 far better than others.\r Here due to my system compatibility is very low. So I havent done hyperparameter tuning. But it is highly recommended to do it if possible.\r # Website Link: [\"https://rainy-brain.herokuapp.com/\"](https://rainy-brain.herokuapp.com/)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bootstrap": "^5.3.2",
+    "express": "^4.18.2",
+    "mongoose": "^8.1.1"
+  }
+}

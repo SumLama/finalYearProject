@@ -1,5 +1,5 @@
 body {
-    background-color: #0fd3dd;
+    background-color: #f5ffff;
     font-family: 'Poppins', sans-serif;
 }
 .form {
@@ -11,7 +11,7 @@ body {
     border-radius: 12px;
 }
 .form h1 {
-    color: #0fd3dd;
+    color: #030c0d;
 }
 
 .button {

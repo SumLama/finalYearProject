@@ -13,7 +13,7 @@
 <body>
     <section id="prediction-form">
         <form class="form" action="/predict", method="POST">
-            <h1 class="my-3 text-center">Predictor</h1>
+            <h1 class="my-3 text-center">Predict for rain</h1>
             <div class="row">
                 <div class="col-md-6 my-2">
                     <div class="md-form">
@@ -38,15 +38,15 @@
                         <label for="Location" class="date">Location</label>
                         <input type="text" class="form-control" id="Location" name="Location">
                     
-                     <!-- <select class="Location" id="Location" name="Location" aria-label="Location">
-                        <option selected>Location</option>
-                        <option>Kathmandu Airport</option>
-                        <option>Buddhanilakantha</option>
-                        <option>Godavari</option>
-                        <option>Nagarkot</option>
-                        <option>Panipokhari(Kathmandu)</option>
+                     <!-- <select class="Location form-select" id="Location" name="Location" aria-label="Location">
                         
-                    </select> -->
+                        <option value="0">Kathmandu Airport</option>
+                        <option value="1">Buddhanilakantha</option>
+                        <option value="2">Godavari</option>
+                        <option value="3">Nagarkot</option>
+                        <option value="4">Panipokhari(Kathmandu)</option>
+                        
+                    </select>  -->
 
                     </div>
                 </div>
@@ -76,23 +76,58 @@
                 </div>
                 <div class="col-md-6 my-2">
                     <div class="md-form">
-                        <label for="RainToday" class="raintoday" name="RainToday">Rain Today</label>
-                        <select class="RainToday" id="RainToday" name="RainToday" aria-label="Rain Today">
-                            <option selected>Did it Rain Today</option>
+                       <label class="RainToday">Did it rain today</label>
+                        <select class="RainToday form-select" id="RainToday" name="RainToday" aria-label="Rain Today">
+                       
                             <option value= 1>Yes</option>
                             <option value= 0>No</option>
                         </select>
                     </div>
                 </div>
-                <div class="col-md-6 my-2 d-flex align-items-end justify-content-around">
-                    <button type="submit" class="btn btn-info button" style="margin-left: 100%;">Predict</button>
+                <div class="row">
+                    <div class=" col-12   my-4 d-flex align-items-end justify-content-end">
+                        <button type="submit" class="btn btn-dark button" >Predict</button>
+                    </div>
                 </div>
             </div>
         </form>
     </section>
     <div>
-         <h1><center> {{ prediction }} </center></h1>
+         <h1><center>{{ prediction}} </center></h1>
     </div>
+    <div class="modal fade" id="predictionModal" tabindex="-1" role="dialog" aria-labelledby="predictionModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="predictionModalLabel">Prediction Result</h5>
+                    
+                </div>
+                <div class="modal-body">
+                    <!-- Display the prediction text here -->
+                    {{ prediction_text }}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="$('#predictionModal').modal('hide')">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+     <!-- Include Bootstrap JS and jQuery -->
+     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+ 
+     <!-- Script to show the modal popup -->
+     <script>
+         $(document).ready(function(){
+             // Check if the prediction text is not empty, then show the modal popup
+             var prediction_text = "{{ prediction_text }}";
+             if (prediction_text.trim() !== "") {
+                 $('#predictionModal').modal('show');
+             }
+         });
+     </script>
+   
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script>
 </body>
 </html>

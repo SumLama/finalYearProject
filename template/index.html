@@ -1,86 +1,133 @@
-<!DOCTYPE html>
-<html lang="en" dir="ltr">
+<!doctype html>
+<html lang="en">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rainfall Predictor</title>
-    <link rel="stylesheet" href={{url_for('static',filename='style1.css')}}>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css">
-  </head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>RainfallPredictor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href={{url_for('static',filename='demo.css')}}>
+  </head> 
   <body>
 
-    <section>
-      <input type="checkbox" id="check">
-      <header>
-        </div>
-        <h2><a href="#" class="logo">Rainfall Predictor</a></h2>
-        <div class="navigation">
-          <a href="#">Home</a>
-          <a href="#about">About</a>
-          <a href="#dashboard">Dashboard</a>
-          <a href="#info">Developer</a>
-          <a href="/predict">Predictor</a>
-        </div>
-        <label for="check">
-        <i class="fas fa-bars menu-btn"></i>
-        <i class="fas fa-times close-btn"></i>
-        </label>
-      </header>
-      <div class="content" style="margin-top: 8%;">
-        <div class="info">
-          <h2>Plant Trees <br><span>Save Rain</span></h2>
-          <p> "Plant trees to bring the rains and get rid of the summer's heat.” - Trees help reduce and moderate the temperature and climate, which is why it is so important that we have more of them</p>
-          <a href="#about" class="info-btn">More info</a>
-        </div>
-      </div>
-    </section>
-
-    <section id="about">
-      <h2>About Rainy Brain</h2>
-      <p class="about-content" style="text-align: center;">Rainfall Predictor is a web app which has 
-      a Machine Learning model running at the back. The purpose of developing this app is to 
-      predict whether it will rain the next day or not. This model is based on the Rain Prediction
-      in Nepal dataset. The codes for this project can be checked in <a href="https://github.com/sujaldangal08/FinalYearProject" style="color: black; font-weight: bold;">github repo</a>. 
-      
-      </p>
-    </section>
-
-    <section id="dashboard">
-      <h2>Dashboard</h2>
-      <p> 
-        
-      </p>
-      <img class="dashboard-image" src="../static/dashboard.png" alt="1">
-      <div>
-        <img src="../static/1.png" alt="1">
-        <img src="../static/3.png" alt="3">
-        <img src="../static/4.png" alt="4">
-        <img src="../static/5.png" alt="5">
-        <img src="../static/6.png" alt="6">
-        <img src="../static/7.png" alt="7">
-        <img src="../static/8.png" alt="8">
-        <img src="../static/9.png" alt="9">
-      </div>
-    </section>
+  <div class="container">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top mb-4 ">
     
-    <section id="info">
-      <div>
-        <img src="../static/vasanth1.png" alt="Vasanth">
+        <a class="navbar-brand text-dark ms-3 fs-5 " href="#"> <i class="bi bi-cloud-rain-fill"></i>  Rainfall Predictor</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse " id="navbarTogglerDemo01">
+          
+
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0 ">
+            <li class="nav-item">
+              <a class="nav-link text-dark  ms-3 fs-5" aria-current="page" href="#">Home</a>
+            </li>
+           
+            <li class="nav-item">
+              <a class="nav-link text-dark ms-3 fs-5 " href="#nav-developer">Developer</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-dark ms-3 fs-5" href="#nav-about">About</a>
+            </li>
+          
+          </ul>
+          
+        {% if 'email'  in session %}
+          
+          <a class="btn btn-outline-dark me-2  ms-3 fs-6" href="{{ url_for('logout')}}"  >Logout</a>
+        {% endif %}
+        </div>
+    
+ 
+  
+    </nav>
+  </div>
+   
+ <div class="conatiner " id="videoContainer">
+  <div class="row m-lg-0  align-items-center">
+    
+      <video playsinline="playsinline" autoplay="autoplay" muted="muted" loop="loop" id="'videoEdit">
+        <source src="../static/videoRain.mp4" type="video/mp4">
+        
+      </video> 
+      <div id="overlay" class=" ms-lg-5  ">
+      
+        <div class="col-12 m-5">
+          {% if 'email'  in session %}
+          <h5 class="text-white mx-20">Welcome {{ session['username'] }}</h5>
+        <h5 class="fw-semibold">Predict before you go</h5>
+          <a href="{{ url_for('predict') }}" class="btn btn-outline-light fw-medium btn-custom" >Predict</a>
+          {% else %}
+        <h5>Login before you predict</h5>
+        <a href="{{ url_for('register') }}" class="btn btn-outline-light fw-medium btn-custom ">Login</a>
+        {% endif %}
       </div>
-      <div>
-        <h2>Developers</h2>
-        <p class="about-content"> 
+    </div>
+ 
+    
+  </div>
+</div>
 
-
-        </p>
+ <div class="container ms-2 " id="nav-about">
+  <div class="row pt-5">
+    
+      <h1>About</h1>
+      <div class="col-6 " >
+        <p class="text-break">
+          Div section for about page..Coming soon</p>
+       </div>
+    </div>
+  </div>
+  <div class="container ms-2 " id="nav-developer">
+    
+    <div class="row  mt-5 d-flex justify-content-center">
+      <h1>Developer</h1>
+      <div class=" col-md-4 col-lg-3  ">
+        <div class="row">
+          <img src="dev1.jpg" class="border-dark-subtle resize img-thumbnail "/>
+        </div>
+        <div class="row ">
+          <p class="resize text-break mt-3">Name:Sujal Dangal
+            Roll.no:23897/076
+            Faculty:Bsc.CSIT
+            Semester:Seven(VII)
+            Orchid International College</p>
+        </div>
       </div>
-    </section>
+      
+        <div class=" col-md-4 col-lg-3">
+          <div class="row">
+            <img src="dev2.jpg" class=" border-dark-subtle resize img-thumbnail "/>
+          </div>
+          <div class="row">
+            <p class="resize text-break mt-3" >Name:Sumitra Tamang<br/>
+              Roll.no:23897/076
+              Faculty:Bsc.CSIT
+              Semester:Seven(VII)
+              Orchid International College</p>
+          </div>
+        </div>
+        <div class="col-12 col-md-3 col-lg-3 ">
+          <div class="row">
+            <img src="dev3.jpg" class="border-dark-subtle  resize img-thumbnail "/>
+          </div>
+          <div class="row">
+            <p class="resize text-break mt-3">Name:Swastika Shrestha
+              Roll.no:23903/076
+              Faculty:Bsc.CSIT
+              Semester:Seven(VII)
+              Orchid International College
+            </p>
+            
+        </div>
+        </div>
+   
+     </div>
 
-    <footer>
-      <p>
-        Developed by Orchidian
-      </p> 
-    </footer>
+ 
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
   </body>
 </html>

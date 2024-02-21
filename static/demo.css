@@ -1,0 +1,53 @@
+.d-block{
+    height:800px;
+    width: 100%;
+}
+.resize{
+    height: 220px;
+    width:180px;
+}
+
+#videoContainer {
+    position: relative;
+    overflow: hidden;
+  }
+#videoEdit{
+   
+    display: nowrap;
+    margin-left: auto;
+    margin-right: auto;
+    /* padding-left: 0.5rem;
+    padding-right: 0.5rem; */
+    z-index: -1;
+    width: 100%;
+    height: 100vh;
+    background-size: cover;
+    
+}
+
+
+ #overlay {
+    position:absolute;
+    z-index:1; 
+    color:rgb(221, 224, 225);
+       
+ }
+ .row {
+     --bs-gutter-x: 0rem;
+ }
+
+.navbar-toggler {
+    border: none !important;
+    background-color: transparent !important;
+    box-shadow: none !important; 
+}
+
+  
+
+
+
+ 
+
+    
+  
+
