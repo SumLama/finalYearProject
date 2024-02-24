@@ -30,7 +30,7 @@ import pandas as pd
 import pickle
 import numpy as np
 import sys
-sys.path.append("E:\DemoPractice")
+sys.path.append("/home/sujaldangal/Documents/Rain-Prediction/randomforest")
 from randomforest.DecisionTree import DecisionTree
 from randomforest.RandomForest import RandomForest
 from sklearn.preprocessing import LabelEncoder
@@ -46,7 +46,7 @@ mongo = PyMongo(app)
 print("connected")
 ###################
 model = pickle.load(open("./models/TrainedModel.pkl", "rb"))
-# label_encoder = pickle.load(open("./models/Location.pkl","rb")) 
+label_encoder = pickle.load(open("./models/Location.pkl","rb")) 
 print("Model Loaded")
 
 @app.route("/", methods=['GET'])
@@ -165,10 +165,10 @@ def predict():
         rainToday = float(request.form['RainToday'])
 
 
-        # encoded_location = label_encoder.transform(location)    
+        encoded_location = label_encoder.transform(location)    
         # Creating input list for prediction
-        # input_lst = [encoded_location, maxTemp,minTemp,humidity,rainfall,rainToday,year, month, day,]
-        input_lst = [location, maxTemp,minTemp,humidity,rainfall,rainToday,year, month, day]
+        input_lst = [encoded_location, maxTemp,minTemp,humidity,rainfall,rainToday,year, month, day,]
+        # input_lst = [location, maxTemp,minTemp,humidity,rainfall,rainToday,year, month, day]
         final_list = np.array(input_lst)
 
          # Create a credentials object from the access token and refresh token
