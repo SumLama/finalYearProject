@@ -1,0 +1,13 @@
+{"web":{"client_id":"328872040381-rb6r6qjitik8pjh8tpmfu3k7ulhk8k10.apps.googleusercontent.com",
+"project_id":"phonic-biplane-415007","auth_uri":
+"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_secret":"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","redirect_uris":["https://localhost;8080"]}}
+
+
+
+//https://accounts.google.com/o/oauth2/auth?scope=https://mail.google.com&access_type=offline&redirect_uri=https://localhost:8080&response_type=code&client_id=328872040381-rb6r6qjitik8pjh8tpmfu3k7ulhk8k10.apps.googleusercontent.com
+
+//https://localhost:8080/?code=4/0AeaYSHBBsptxnQimb-oRMuxEkPpcnLa-INzskyY9DDWQUp_vYCDvp44iZOvr5UeMKv-jNQ&scope=https://mail.google.com/
+
+
+"refresh_token": "1//0gIospL8XGmGsCgYIARAAGBASNwF-L9IrNXsNMy8dgixevtIlq6KvnSrcnN1BXRguN5yYGnBYVQy9nvno3eoWGBJ9wvcSGUlEUTo",
+"access_token": "ya29.a0AfB_byDgkTU40Rp5ygaIJyI74pRM9m4AADaRlTQ9b1y3ojCD7v1EA1Ocmgy2I_-usdtLxdSu3jNKf4UwvbxKiKIV_HkK9L-1KPwEw0fHAJQkBpf6JSzvWmWy7VvVNuTcxR2bYN-4Ui_Od4k6iZG6flUv_5AeyVFzjojMaCgYKAV8SARASFQHGX2MiD3nkybmZagQ4ocW-TooVTw0171",

@@ -36,13 +36,13 @@
                 <div class="col-md-6 my-2">
                     <div class="md-form">
                         <label for="Location" class="date">Location</label>
-                        <!-- <input type="text" class="form-control" id="Location" name="Location"> -->
+                       <!-- <input type="text" class="form-control" id="Location" name="Location"> -->
                     
                      <select class="Location form-select" id="Location" name="Location" aria-label="Location">
                         
-                        <option value="0">Kathmandu Airport</option>
-                        <option value="1">Buddhanilakantha</option>
-                        <option value="2">Godavari</option>
+                        <option value="2">Kathmandu Airport</option>
+                        <option value="0">Buddhanilakantha</option>
+                        <option value="1">Godavari</option>
                         <option value="3">Nagarkot</option>
                         <option value="4">Panipokhari(Kathmandu)</option>
                         
@@ -85,9 +85,11 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class=" col-12   my-4 d-flex align-items-end justify-content-end">
-                        <button type="submit" class="btn btn-dark button" >Predict</button>
+                    <div class=" col-12  my-4 d-flex align-items-end justify-content-end me-0">
+                        <button type="submit" class="btn btn-dark button m-1" style="height: 40px;" >Predict</button>
+                        <a href="{{url_for('home')}}"  class="btn btn-dark  m-1" style="height: 40px;">Back to home</a>
                     </div>
+                   
                 </div>
             </div>
         </form>

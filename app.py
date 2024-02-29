@@ -8,18 +8,18 @@ from flask_mail import Mail, Message
 from email_validator import validate_email, EmailNotValidError
 from email.mime.multipart import MIMEMultipart
 from functools import wraps
-# from googleapiclient.errors import HttpError
-# from googleapiclient.discovery import build
-# from google.oauth2.credentials import Credentials
-# from google.auth.transport.requests import Request
+from googleapiclient.errors import HttpError
+from googleapiclient.discovery import build
+from google.oauth2.credentials import Credentials
+from google.auth.transport.requests import Request
 
 import pickle
 import base64
 import re
 # for email
 
-# from pymongo import MongoClient
-# from email.mime.text import MIMEText
+from pymongo import MongoClient
+from email.mime.text import MIMEText
 
 # for email validation
 
@@ -30,7 +30,7 @@ import pandas as pd
 import pickle
 import numpy as np
 import sys
-sys.path.append("/home/sujaldangal/Documents/Rain-Prediction/randomforest")
+sys.path.append("E:\DemoPractice")
 from randomforest.DecisionTree import DecisionTree
 from randomforest.RandomForest import RandomForest
 from sklearn.preprocessing import LabelEncoder
@@ -45,8 +45,8 @@ app.config['MONGO_URI'] = "mongodb://localhost:27017/UserDb"
 mongo = PyMongo(app)
 print("connected")
 ###################
-model = pickle.load(open("./models/TrainedModel.pkl", "rb"))
-label_encoder = pickle.load(open("./models/Location.pkl","rb")) 
+model = pickle.load(open("models\TrainedModel.pkl", "rb"))
+# label_encoder = pickle.load(open("./models/Location.pkl","rb")) 
 print("Model Loaded")
 
 @app.route("/", methods=['GET'])
@@ -64,12 +64,47 @@ def login_required(func):
     return decorated_function
 
 
+# @ app.route('/login', methods=['GET', 'POST'])
+# def login():
+#     if request.method == 'POST':
+#         email = request.form.get('email')
+#         password = request.form.get('password')
+       
+      
+#         user_email = session.get('email')
+#         print(user_email)
+
+#         # check if email and password are not empty
+#         if not email or not password:
+#             error_message = "Email and password are required."
+#             return f"<script>alert('{error_message}');window.location='/login'</script>"
+
+#         user = mongo.db.user
+
+#         login_user = user.find_one({'email': email})
+
+#         if login_user:
+#             user_email = login_user['email']
+#             session['email'] = user_email
+
+#             if bcrypt.checkpw(password.encode('utf-8'), login_user['password']):
+#                 session['email'] = email
+#                 session['username'] = login_user['username']
+#                 return redirect('/')
+#             else:
+#                 error_message = "Invalid email or password."
+#         else:
+#             error_message = "User not registered"
+
+#         # display the error message using JavaScript alert function
+#         return f"<script>alert('{error_message}');window.location='/login'</script>"    
+   
+#     return render_template('signIn.html')
 @ app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         email = request.form.get('email')
         password = request.form.get('password')
-       
         user_name = session.get('username')
         user_email = session.get('email')
         print(user_email)
@@ -97,48 +132,44 @@ def login():
             error_message = "User not registered"
 
         # display the error message using JavaScript alert function
-        return f"<script>alert('{error_message}');window.location='/login'</script>"    
+        return f"<script>alert('{error_message}');window.location='/login'</script>"
+
     return render_template('signIn.html')
 
-@app.route("/register", methods=['GET','POST'])
+@app.route('/register', methods=["GET", "POST"])
 def register():
     if request.method == 'POST':
+        print(request.form) 
         user = mongo.db.user
-        # existing_user = user.find_one({'username': request.form['username']})
-        # existing_email = user.find_one({'email': request.form['email']})
-        # if existing_email:
-        #     email_error = "email have been already used."
-        #     return f"<script>alert('{email_error}');window.location='/register'</script>"
+        existing_email = user.find_one({'email': request.form.get('email')})
+        if existing_email:
+            email_error = "email have been already used."
+            return f"<script>alert('{email_error}');window.location='/login'</script>"
 
-        # if existing_user:
-        #     name_error = "username is already taken."
-        #     return f"<script>alert('{name_error}');window.location='/register'</script>"
-        
-        
-        if request.form['password'] != request.form['confirm_password']:
+        if request.form.get('password') != request.form.get('confirm_password'):
             pass_error = "password do not matched"
             return f"<script>alert('{pass_error}');window.location='/register'</script>"
 
-        if len(request.form["password"]) < 8:
+        if len(request.form.get('password')) < 8:
             pass_error = "password must be of 8 character"
             return f"<script>alert('{pass_error}');window.location='/register'</script>"
 
         password_pattern = "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$"
 
-        if not re.fullmatch(password_pattern, request.form["password"]):
+        if not re.fullmatch(password_pattern, request.form.get('password')):
             pass_error = "uppercase letters: A-Z, lowercase letters: a-z, numbers: 0-9, any of the special characters: @#$%^&+="
             return f"<script>alert('{pass_error}');window.location='/register'</script>"
 
         hashpass = bcrypt.hashpw(
-            request.form['password'].encode('utf-8'), bcrypt.gensalt())
+            request.form.get('password').encode('utf-8'), bcrypt.gensalt())
         user.insert_one(
-            {'username': request.form['username'], 'password': hashpass, 'email': request.form['email']})
-        session['username'] = request.form['username']
-        session['email'] = request.form['email']
+            {'username': request.form.get('username'), 'password': hashpass, 'email': request.form.get('email')})
+        session['email'] = request.form.get('email')
 
-        return render_template("signIn.html")
+        return f"<script>alert('User registered successfully!');window.location='/login'</script>" 
+       
+    return render_template('register.html')
 
-    return render_template("register.html")
     
 
 @app.route("/predict", methods=['GET','POST'])
@@ -165,79 +196,61 @@ def predict():
         rainToday = float(request.form['RainToday'])
 
 
-        encoded_location = label_encoder.transform(location)    
+        # encoded_location = label_encoder.fit_transform(location)    
         # Creating input list for prediction
-        input_lst = [encoded_location, maxTemp,minTemp,humidity,rainfall,rainToday,year, month, day,]
-        # input_lst = [location, maxTemp,minTemp,humidity,rainfall,rainToday,year, month, day]
+        # input_lst = [encoded_location, maxTemp,minTemp,humidity,rainfall,rainToday,year, month, day,]
+        input_lst = [location, maxTemp,minTemp,humidity,rainfall,rainToday,year, month, day]
         final_list = np.array(input_lst)
 
-         # Create a credentials object from the access token and refresh token
-        # creds = Credentials(
-        #     ACCESS_TOKEN,
-        #     token_uri=TOKEN_URI,
-        #     refresh_token=REFRESH_TOKEN,
-        #     client_id=CLIENT_ID,
-        #     client_secret=CLIENT_SECRET)
-        # if creds and creds.expired and creds.refresh_token:
-        #     creds.refresh(Request())
+         #Create a credentials object from the access token and refresh token
+        creds = Credentials(
+            ACCESS_TOKEN,
+            token_uri=TOKEN_URI,
+            refresh_token=REFRESH_TOKEN,
+            client_id=CLIENT_ID,
+            client_secret=CLIENT_SECRET)
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
 
-        # service = build('gmail', 'v1', credentials=creds)
+        service = build('gmail', 'v1', credentials=creds)
        
         # Predicting
         pred = model.predict(final_list)
             
             # Rendering template based on prediction
-        if pred[0] == 0:
+       
                 #  pass_error = "password must be of 8 character"
                 # return f"<script>alert('{pass_error}');window.location='/register'</script>"
-                # try:
-                #     subject = 'Rainfall Notification'
-                #     message = f'Hello there,there will be no rain in  on your desired date.Enjoy with your friends and family. Thankyou'
-                #     msg = MIMEText(message)
-                #     msg['to'] = user_email
-                #     msg['subject'] = subject
-                #     raw_message = base64.urlsafe_b64encode(
-                #         msg.as_bytes()).decode('utf-8')
-                #     send_message = {'raw': raw_message}
-                #     send_message = (service.users().messages().send(
-                #         userId="me", body=send_message).execute())
-                #     print(
-                #         F'The email was sent to {user_email} with email Id: {send_message["id"]}')
-                # except HttpError as error:
-                #     print(F'An error occurred: {error}')
-                #     send_message = None
-             prediction_text = " It is likely to be sunny"
-                
-        else:
-                # try:
-                #     subject = 'Rainfall Notification'
-                #     message = f'hello there,there will be rain on your desired date, please take care while going outside. Thankyou'
-                #     msg = MIMEText(message)
-                #     msg['to'] = user_email
-                #     msg['subject'] = subject
-                #     raw_message = base64.urlsafe_b64encode(
-                #         msg.as_bytes()).decode('utf-8')
-                #     send_message = {'raw': raw_message}
-                #     send_message = (service.users().messages().send(
-                #         userId="me", body=send_message).execute())
-                #     print(
-                #         F'The email was sent to {user_email} with email Id: {send_message["id"]}')
-                # except HttpError as error:
-                #     print(F'An error occurred: {error}')
-                #     send_message = None
-                prediction_text = " It is likely to rain"
-           
+        try:
+            user_email = session.get('email')  # Assuming the user's email is stored in the session
+            if pred[0] == 0:
+                subject = 'Rainfall Notification'
+                message = 'Hello there, there will be no rain on your desired date. Enjoy with your friends and family. Thank you'
+            else:
+                subject = 'Rainfall Notification'
+                message = 'Hello there, there will be rain on your desired date. Please take care while going outside. Thank you'
 
-    
-    
+            msg = MIMEText(message)
+            msg['to'] = user_email
+            msg['subject'] = subject
+            raw_message = base64.urlsafe_b64encode(msg.as_bytes()).decode('utf-8')
+            send_message = {'raw': raw_message}
+            send_message = service.users().messages().send(userId="me", body=send_message).execute()
+            print(F'The email was sent to {user_email} with email Id: {send_message["id"]}')
+        except HttpError as error:
+            print(F'An error occurred: {error}')
+            send_message = None
+
+        prediction_text = "It is likely to be sunny, you can enjoy the outing to your desired location with your family and friends." if pred[0] == 0 else "It is likely to rain,so you might want to consider bringing an umbrella or planning indoor activities."
+
     return render_template("predictor.html", prediction_text=prediction_text)
 
 # # for email message
-# CLIENT_ID = '279094025508-q5l5k4l57i8lpjq09239bvoj2n0t4j76.apps.googleusercontent.com'
-# CLIENT_SECRET = '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'
-# ACCESS_TOKEN = 'ya29.a0AWY7CklY8IXfBClmOoDflHxQYtlb18h5khuk14RFqYv6ExHJyjTtgS1eCI3AO6uTQzgmXdrGH94x3PqUk2lRadUUcyUqCIBJSIJxPoOy-4XWdtFwvz8zjG5wYmPEoT61q0HOdn2bJoo5WKjWCa2oIWTxOFXyaCgYKAbASARESFQG1tDrp7tpCogLYQoGQ1XDZPsyTpw0163'
-# REFRESH_TOKEN = '1//    04KTZsKHl30GxCgYIARAAGAQSNwF-L9Ir93qmnAzADRxj0K5RiQG_5f4pUkC2_dhUTUHPWZpaoI3T4E3kVHNf2whE799rgczlE6A'
-# TOKEN_URI = 'https://oauth2.googleapis.com/token'
+CLIENT_ID = '620539546907-f31a9podppn69tqgm43k9j835scni076.apps.googleusercontent.com'
+CLIENT_SECRET = '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'
+ACCESS_TOKEN = 'ya29.a0AfB_byBxsRQ-C0C_v_1XIwtbYlhyKoekYtzso5fQqwsBdwQ1qCKmyLVX-oCHrQSNlSgtLN5eitvQw8bb3TboGBPL80kdiLCiL03XSR7jVwduAVV0F-G1wfZ3AJ7ZIVdPMztLu80FoosfbUS4NuHzVw1Fn6_ZefNDhpViaCgYKAc0SARASFQHGX2MiT1PF_12HGh0Bur5Ayo6-Kg0171'
+REFRESH_TOKEN = '1//0g-_vl0bPd-_HCgYIARAAGBASNwF-L9IrA9reVpSZOvRoG56oueQvaVFFpHqoILGAOI7kmULgqOdEisYNt6SnEwXmgnRYVZFGVyc'
+TOKEN_URI = 'https://oauth2.googleapis.com/token'
 
 # @ app.route("/email", methods=['GET', 'POST'])
 # def email():
@@ -284,6 +297,46 @@ def logout():
     session.clear()
 
     return redirect(url_for('home'))
+def admin_required(func):
+    @wraps(func)
+    def decorated_function(*args, **kwargs):
+        if 'email' not in session:
+            return render_template('home.html')
+        if 'email' in session:
+            if session['email'] != 'rainfallPredictor@gmail.com' :
+                denied_error = "Authorization denied"
+
+                return f"<script>alert('{denied_error}');window.location='/home'</script>"
+        return func(*args, **kwargs)
+
+    return decorated_function
+
+@app.route('/admin')
+@admin_required
+def admin_panel():
+    if 'email' in session:
+        if session['email'] != 'rainfallPredictor@gmail.com':
+            pass_error = "Not Authorized"
+            return f"<script>alert('{pass_error}');window.location='/'</script>"
+
+    user = mongo.db.user
+
+    users = user.find({})
+    return render_template('admin.html', users=users)
+
+
+@app.route('/admin/delete', methods=['POST'])
+@admin_required
+def delete_user():
+
+    uname = request.form['user_id']
+
+    user = mongo.db.user
+
+    users = user.delete_one({'username': uname})
+
+    return redirect('/admin')
+
 
 if __name__ == '__main__':
     app.run(debug=True)

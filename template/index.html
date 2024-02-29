@@ -13,36 +13,35 @@
   <div class="container">
     <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top mb-4 ">
     
-        <a class="navbar-brand text-dark ms-3 fs-5 " href="#"> <i class="bi bi-cloud-rain-fill"></i>  Rainfall Predictor</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse " id="navbarTogglerDemo01">
-          
+      <a class="navbar-brand text-dark ms-3" href="#"> <i class="bi bi-cloud-rain-fill"></i>  Rainfall Predictor</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse " id="navbarTogglerDemo01">
+        
 
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0 ">
-            <li class="nav-item">
-              <a class="nav-link text-dark  ms-3 fs-5" aria-current="page" href="#">Home</a>
-            </li>
-           
-            <li class="nav-item">
-              <a class="nav-link text-dark ms-3 fs-5 " href="#nav-developer">Developer</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link text-dark ms-3 fs-5" href="#nav-about">About</a>
-            </li>
-          
-          </ul>
-          
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 ">
+          <li class="nav-item">
+            <a class="nav-link text-dark  ms-3" aria-current="page" href="#">Home</a>
+          </li>
+         
+          <li class="nav-item">
+            <a class="nav-link text-dark ms-3" href="#nav-developer">Developer</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-dark ms-3" href="#nav-about">About</a>
+          </li>
+        
+        </ul>
         {% if 'email'  in session %}
-          
+        
           <a class="btn btn-outline-dark me-2  ms-3 fs-6" href="{{ url_for('logout')}}"  >Logout</a>
         {% endif %}
-        </div>
+        
+      </div>
+  </nav>
     
- 
-  
-    </nav>
+        </div>
   </div>
    
  <div class="conatiner " id="videoContainer">
@@ -57,9 +56,14 @@
         <div class="col-12 m-5">
           {% if 'email'  in session %}
           <h5 class="text-white mx-20">Welcome {{ session['username'] }}</h5>
-        <h5 class="fw-semibold">Predict before you go</h5>
-          <a href="{{ url_for('predict') }}" class="btn btn-outline-light fw-medium btn-custom" >Predict</a>
-          {% else %}
+          {% if session['email'] != 'rainfallPredictor@gmail.com' %}
+            <h5 class="fw-semibold">Predict before you go</h5>
+              <a href="{{ url_for('predict') }}" class="btn btn-outline-light fw-medium btn-custom" >Predict</a>
+            {% else %}
+            <a href="{{ url_for('admin_panel') }}" class="btn btn-outline-light fw-medium btn-custom"><i class="bi bi-person"></i> Admin</a>
+              {% endif %}
+
+              {% else %}
         <h5>Login before you predict</h5>
         <a href="{{ url_for('register') }}" class="btn btn-outline-light fw-medium btn-custom ">Login</a>
         {% endif %}
@@ -76,7 +80,18 @@
       <h1>About</h1>
       <div class="col-6 " >
         <p class="text-break">
-          Div section for about page..Coming soon</p>
+          A rainfall prediction system uses historical weather data,
+           machine learning algorithms, 
+           and statistical models to forecast future rainfall patterns. 
+           It collects and analyzes data such as temperature, humidity,location, date to predict the
+            likelihood and intensity of rainfall in a specific area over a 
+            certain period. By providing early warnings and insights, 
+            these systems help in travel and outing by predicting the probability of rain.
+        </p>
+         
+       </div>
+       <div class="col-6 d-flex justify-content-end me-0">
+        <img src="../static/rainimg2.jpeg" height="200px" width="400px"/>
        </div>
     </div>
   </div>
@@ -84,9 +99,9 @@
     
     <div class="row  mt-5 d-flex justify-content-center">
       <h1>Developer</h1>
-      <div class=" col-md-4 col-lg-3  ">
+      <div class=" col-md-4 col-lg-3  mt-4 ">
         <div class="row">
-          <img src="dev1.jpg" class="border-dark-subtle resize img-thumbnail "/>
+          <img src="../static/dev1 (1).jpg" class="border-dark-subtle resize img-thumbnail "/>
         </div>
         <div class="row ">
           <p class="resize text-break mt-3">Name:Sujal Dangal
@@ -97,9 +112,9 @@
         </div>
       </div>
       
-        <div class=" col-md-4 col-lg-3">
+        <div class=" col-md-4 col-lg-3 mt-4">
           <div class="row">
-            <img src="dev2.jpg" class=" border-dark-subtle resize img-thumbnail "/>
+            <img src="../static/dev2.jfif" class=" border-dark-subtle resize img-thumbnail "/>
           </div>
           <div class="row">
             <p class="resize text-break mt-3" >Name:Sumitra Tamang<br/>
@@ -109,9 +124,9 @@
               Orchid International College</p>
           </div>
         </div>
-        <div class="col-12 col-md-3 col-lg-3 ">
+        <div class="col-12 col-md-3 col-lg-3 mt-4 ">
           <div class="row">
-            <img src="dev3.jpg" class="border-dark-subtle  resize img-thumbnail "/>
+            <img src="../static/dev3.jpg" class="border-dark-subtle  resize img-thumbnail "/>
           </div>
           <div class="row">
             <p class="resize text-break mt-3">Name:Swastika Shrestha
