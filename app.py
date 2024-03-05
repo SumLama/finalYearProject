@@ -2,7 +2,6 @@ import bcrypt
 from flask_pymongo import PyMongo
 from flask_login import login_required
 from flask import flash, Flask, render_template, request, redirect, url_for, session
-from flask_toastr import Toastr
 
 import numpy as np
 import pandas as pd
@@ -19,7 +18,7 @@ import pickle
 import base64
 import re
 # for email
-
+from datetime import datetime
 from pymongo import MongoClient
 from email.mime.text import MIMEText
 
@@ -58,7 +57,6 @@ def home():
     return render_template("index.html")
 
 
-
 def login_required(func):
     @wraps(func)
     def decorated_function(*args, **kwargs):
@@ -83,7 +81,7 @@ def login():
             flash(error_message,"error")
             
 
-        user = mongo.db.user
+        user = mongo.db.user 
 
         login_user = user.find_one({'email': email})
 
@@ -110,48 +108,6 @@ def login():
 
     return render_template('signIn.html')
 
-# @app.route('/register', methods=["GET", "POST"])
-# def register():
-#     if request.method == 'POST':
-#         print(request.form) 
-#         user = mongo.db.user
-#         existing_email = user.find_one({'email': request.form.get('email')})
-#         if not request.form.get('username'):
-#             username_error = "Enter the fullname"
-#             return f"<script>alert('{username_error}');window.location='/login'</script>"
-#         if not request.form.get('email'):
-#             email_error = "Enter the email for registration"
-#             return f"<script>alert('{email_error}');window.location='/login'</script>"
-        
-#         if existing_email:
-#             email_error = "email have been already used."
-#             return f"<script>alert('{email_error}');window.location='/login'</script>"
-        
-        
-#         if request.form.get('password') != request.form.get('confirm_password'):
-#             pass_error = "password do not matched"
-#             return f"<script>alert('{pass_error}');window.location='/register'</script>"
-
-#         if len(request.form.get('password')) < 8:
-#             pass_error = "password must be of 8 character"
-#             return f"<script>alert('{pass_error}');window.location='/register'</script>"
-
-#         password_pattern = "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$"
-
-#         if not re.fullmatch(password_pattern, request.form.get('password')):
-#             pass_error = "uppercase letters: A-Z, lowercase letters: a-z, numbers: 0-9, any of the special characters: @#$%^&+="
-#             return f"<script>alert('{pass_error}');window.location='/register'</script>"
-
-#         hashpass = bcrypt.hashpw(
-#             request.form.get('password').encode('utf-8'), bcrypt.gensalt())
-#         user.insert_one(
-#             {'username': request.form.get('username'), 'password': hashpass, 'email': request.form.get('email')})
-#         session['email'] = request.form['email']
-       
-#         return render_template('register.html')
-       
-       
-#     return render_template('register.html')
 
 @app.route('/register', methods=["GET", "POST"])
 def register():
@@ -202,10 +158,10 @@ def register():
 @app.route("/predict", methods=['GET','POST'])
 @ login_required
 def predict():
-    
-    prediction_text = ""
+   
+    prediction_text = " "  
     if request.method == "POST":
-    
+         
         # Extracting data from the form
         # date = pd.to_datetime(request.form['Date'])
         year = float(request.form['Year'])
@@ -242,33 +198,39 @@ def predict():
        
         # Predicting
         pred = model.predict(final_list)
+        
             
-            # Rendering template based on prediction
-       
-                #  pass_error = "password must be of 8 character"
-                # return f"<script>alert('{pass_error}');window.location='/register'</script>"
         try:
-            user_email = session.get('email')  # Assuming the user's email is stored in the session
+            current_time = datetime.now()
+            user_email = session.get('email')
+            if current_time.hour < 12:
+                greeting = "Good morning"
+            elif current_time.hour < 18:
+                greeting = "Good afternoon"
+            else:
+                greeting = "Good evening" 
+
             if pred[0] == 0:
                 subject = 'Rainfall Notification'
-                message = 'Hello there, there will be no rain on your desired date. Enjoy with your friends and family. Thank you'
+                message = 'Welcome to Rainfall Prediction System, you have predicted the rainfall for tomorrow, so there will be no rainfall on your desired date. Enjoy with your friends and family. Thank you'
             else:
-                subject = 'Rainfall Notification'
-                message = 'Hello there, there will be rain on your desired date. Please take care while going outside. Thank you'
+                 subject = 'Rainfall Notification'
+                 message = 'Welcome to Rainfall Prediction System, you have predicted the rainfall for tomorrow, so there will be rainfall on your desired date. Please take care while going outside. Thank you'
 
-            msg = MIMEText(message)
+            msg = MIMEText(message,'html')
             msg['to'] = user_email
             msg['subject'] = subject
             raw_message = base64.urlsafe_b64encode(msg.as_bytes()).decode('utf-8')
             send_message = {'raw': raw_message}
             send_message = service.users().messages().send(userId="me", body=send_message).execute()
+            session['composed_message'] = {'subject': subject, 'message': message}
+
             print(F'The email was sent to {user_email} with email Id: {send_message["id"]}')
         except HttpError as error:
             print(F'An error occurred: {error}')
             send_message = None
-
-        prediction_text = "It is likely to be sunny, you can enjoy the outing to your desired location with your family and friends." if pred[0] == 0 else "It is likely to rain,so you might want to consider bringing an umbrella or planning indoor activities."
-
+        prediction_text = f"{greeting}, no rain expected.It is not likely to rain, you can enjoy the outing to your desired location with your family and friends." if pred[0] == 0 else f"{greeting}, rain expected.It is likely to rain,so you might want to consider bringing an umbrella or planning indoor activities."
+        
     return render_template("predictor.html", prediction_text=prediction_text)
 
 # # for email message
@@ -278,7 +240,55 @@ ACCESS_TOKEN = 'ya29.a0AfB_byBxsRQ-C0C_v_1XIwtbYlhyKoekYtzso5fQqwsBdwQ1qCKmyLVX-
 REFRESH_TOKEN = '1//0g-_vl0bPd-_HCgYIARAAGBASNwF-L9IrA9reVpSZOvRoG56oueQvaVFFpHqoILGAOI7kmULgqOdEisYNt6SnEwXmgnRYVZFGVyc'
 TOKEN_URI = 'https://oauth2.googleapis.com/token'
 
-@ app.route("/email", methods=['GET', 'POST'])
+# @ app.route("/email", methods=['GET', 'POST'])
+# def email():
+#     if request.method == "POST":
+#         try:
+#             # Create a credentials object from the access token and refresh token
+#             creds = Credentials(
+#                 ACCESS_TOKEN,
+#                 token_uri=TOKEN_URI,
+#                 refresh_token=REFRESH_TOKEN,
+#                 client_id=CLIENT_ID,
+#                 client_secret=CLIENT_SECRET)
+#             if creds and creds.expired and creds.refresh_token:
+#                 creds.refresh(Request())
+
+
+# # # Create a Gmail API service client
+#             service = build('gmail', 'v1', credentials=creds)
+
+#             to = request.form.getlist('receiver_email')
+#             if not request.form.get('receiver_email'):
+#                 email_error = "Enter the email for registration"
+#                 flash(email_error,"error")
+#                 return redirect('/email')
+            
+#             composed_message = session.get('composed_message', {})
+#             if not composed_message:
+#                 flash("No composed message found. Please try again.", "error")
+#                 return redirect('/email')
+#             subject = composed_message['subject']
+          
+#             msg = MIMEText(composed_message['message'])
+#             msg['to'] = to
+#             msg['subject'] = subject
+#             raw_message = base64.urlsafe_b64encode(
+#                 msg.as_bytes()).decode('utf-8')
+
+#             send_message = {'raw': raw_message}
+#             send_message = (service.users().messages().send(
+#                 userId="me", body=send_message).execute())
+#             print(
+#                 F'The email was sent to {to} with email Id: {send_message["id"]}')
+#             flash("Email sent successfully!", "success")
+#         except HttpError as error:
+#             print(F'An error occurred: {error}')
+          
+#             flash("Failed to send email. Please try again.", "error")
+
+#     return render_template('email.html')
+@app.route("/email", methods=['GET', 'POST'])
 def email():
     if request.method == "POST":
         try:
@@ -292,36 +302,45 @@ def email():
             if creds and creds.expired and creds.refresh_token:
                 creds.refresh(Request())
 
-
-# # Create a Gmail API service client
+            # Create a Gmail API service client
             service = build('gmail', 'v1', credentials=creds)
 
-            to = request.form['receiver_email']
-            if not request.form.get('receiver_email'):
-                email_error = "Enter the email for registration"
-                flash(email_error,"error")
+            # Get the receiver's emails from the form
+            receivers = request.form.getlist('receiver_email')
+            if not receivers:
+                email_error = "Enter at least one email address"
+                flash(email_error, "error")
                 return redirect('/email')
-            
-            subject = 'Rainfall Notification'
-            message = request.form['message']
-            msg = MIMEText(message)
-            msg['to'] = to
-            msg['subject'] = subject
-            raw_message = base64.urlsafe_b64encode(
-                msg.as_bytes()).decode('utf-8')
 
-            send_message = {'raw': raw_message}
-            send_message = (service.users().messages().send(
-                userId="me", body=send_message).execute())
-            print(
-                F'The email was sent to {to} with email Id: {send_message["id"]}')
-            flash("Email sent successfully!", "success")
+            composed_message = session.get('composed_message', {})
+            if not composed_message:
+                flash("No composed message found. Please try again.", "error")
+                return redirect('/email')
+            subject = composed_message['subject']
+            user_email = session.get('email')
+            forward_notification =  f"This message was forwarded by {user_email}"
+            message_body = f"{composed_message['message']}\n\n{forward_notification}"
+            msg = MIMEText(message_body)
+          
+            msg['subject'] = subject
+
+            for receiver in receivers:
+                msg['to'] = receiver
+                raw_message = base64.urlsafe_b64encode(
+                    msg.as_bytes()).decode('utf-8')
+
+                send_message = {'raw': raw_message}
+                send_message = (service.users().messages().send(
+                    userId="me", body=send_message).execute())
+                print(
+                    F'The email was sent to {receiver} with email Id: {send_message["id"]}')
+            flash("Emails sent successfully!", "success")
         except HttpError as error:
             print(F'An error occurred: {error}')
-          
-            flash("Failed to send email. Please try again.", "error")
+            flash("Failed to send emails. Please try again.", "error")
 
     return render_template('email.html')
+
 
 @ app.route('/logout')
 def logout():

@@ -55,7 +55,7 @@
       
         <div class="col-12 m-5">
           {% if 'email'  in session %}
-          <h5 class="text-white mx-20">Welcome {{ session['username'] }}</h5>
+          <h3 class="text-white mx-20">Welcome, {{ session['username'] }}</h3 >
           {% if session['email'] != 'rainfallPredictor@gmail.com' %}
             <h5 class="fw-semibold">Predict before you go</h5>
               <a href="{{ url_for('predict') }}" class="btn btn-outline-light fw-medium btn-custom" >Predict</a>
@@ -75,12 +75,12 @@
 </div>
 
  <div class="container ms-2 " id="nav-about">
-  <div class="row pt-5">
+  <div class="row pt-5" >
     
-      <h1>About</h1>
-      <div class="col-6 " >
+      <h1 class="text-center"> About </h1>
+      <div class="col-6" >
         <p class="text-break">
-          A rainfall prediction system uses historical weather data,
+         Our rainfall prediction system uses historical weather data,
            machine learning algorithms, 
            and statistical models to forecast future rainfall patterns. 
            It collects and analyzes data such as temperature, humidity,location, date to predict the
@@ -97,8 +97,8 @@
   </div>
   <div class="container ms-2 " id="nav-developer">
     
-    <div class="row  mt-5 d-flex justify-content-center">
-      <h1>Developer</h1>
+    <div class="row pt-5 mt-5 d-flex justify-content-center">
+      <h1 class="text-center">Developer</h1>
       <div class=" col-md-4 col-lg-3  mt-4 ">
         <div class="row">
           <img src="../static/dev1 (1).jpg" class="border-dark-subtle resize img-thumbnail "/>
@@ -140,7 +140,9 @@
         </div>
    
      </div>
-
+     <div class="container">
+ 
+  </div>
  
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
