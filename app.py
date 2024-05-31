@@ -5,9 +5,7 @@ from flask import flash, Flask, render_template, request, redirect, url_for, ses
 
 import numpy as np
 import pandas as pd
-from flask_mail import Mail, Message
-from email_validator import validate_email, EmailNotValidError
-from email.mime.multipart import MIMEMultipart
+
 from functools import wraps
 from googleapiclient.errors import HttpError
 from googleapiclient.discovery import build
@@ -21,7 +19,8 @@ import re
 from datetime import datetime
 from pymongo import MongoClient
 from email.mime.text import MIMEText
-
+from bs4 import BeautifulSoup
+from datetime import datetime , date , timedelta
 # for email validation
 
 ####imported new
@@ -34,7 +33,7 @@ import sys
 sys.path.append("E:\DemoPractice")
 from randomforest.DecisionTree import DecisionTree
 from randomforest.RandomForest import RandomForest
-from sklearn.preprocessing import LabelEncoder
+
 
 
 
@@ -155,6 +154,7 @@ def register():
 
     return render_template('register.html')   
 
+
 @app.route("/predict", methods=['GET','POST'])
 @ login_required
 def predict():
@@ -164,24 +164,28 @@ def predict():
          
         # Extracting data from the form
         # date = pd.to_datetime(request.form['Date'])
-        year = float(request.form['Year'])
-        month = float(request.form['Month'])
-        day = float(request.form['Day'])
+        # year = float(request.form['Year'])
+        # month = float(request.form['Month'])
+        # day = float(request.form['Day'])
+        date_str = request.form['Date']
+        year, month, day = map(int, date_str.split('-'))
      
         # day = float(date.day)
         # month = float(date.month)
         minTemp = float(request.form['min_temp'])
         maxTemp = float(request.form['max_temp'])
-        # rainfall = float(request.form['Rainfall'])
+        rainfall = float(request.form['Rainfall'])
         humidity = float(request.form['Humidity'])
         location = float(request.form['Location'])
         rainToday = float(request.form['RainToday'])
+       
+     
 
 
         # encoded_location = label_encoder.fit_transform(location)    
         # Creating input list for prediction
         # input_lst = [encoded_location, maxTemp,minTemp,humidity,rainfall,rainToday,year, month, day,]
-        input_lst = [location, maxTemp,minTemp,humidity,rainToday,year, month, day]
+        input_lst = [location, maxTemp,minTemp,humidity,rainToday,rainfall,year, month, day]
         final_list = np.array(input_lst)
 
          #Create a credentials object from the access token and refresh token
@@ -198,8 +202,7 @@ def predict():
        
         # Predicting
         pred = model.predict(final_list)
-        
-            
+     
         try:
             current_time = datetime.now()
             user_email = session.get('email')
@@ -210,12 +213,46 @@ def predict():
             else:
                 greeting = "Good evening" 
 
+            selected_date = datetime.strptime(date_str, '%Y-%m-%d')
+            next_day = selected_date + timedelta(days=1)
+            next_day_str = next_day.strftime('%Y-%m-%d')
+
+            location_names = {
+                0.0 : "Buddhanilakantha",
+                2.0 : "Kathmandu Airport",
+                3.0 : "Nagarkot",
+                4.0 : "Panipokhari(Kathmandu)",
+                1.0 : "Godavari",
+
+            }
+
             if pred[0] == 0:
                 subject = 'Rainfall Notification'
-                message = 'Welcome to Rainfall Prediction System, you have predicted the rainfall for tomorrow, so there will be no rainfall on your desired date. Enjoy with your friends and family. Thank you'
+                message = f"""\
+                <html>
+                    <body>
+                        <p>Dear User,</p>
+                        <p>Welcome to the Rainfall Prediction System. Based on our analysis, it appears that there will be no rainfall in {location_names.get(location, 'Unknown Location')} area on {next_day_str}.</p>
+                        <p>Enjoy your day outdoors with friends and family.</p>
+                        <p>Thank you for using our service.</p>
+                        <p>Best regards</p>
+                    </body>
+                </html>
+            
+                """
             else:
                  subject = 'Rainfall Notification'
-                 message = 'Welcome to Rainfall Prediction System, you have predicted the rainfall for tomorrow, so there will be rainfall on your desired date. Please take care while going outside. Thank you'
+                 message = f"""\
+                 <html>
+                    <body>
+                        <p>Dear User,</p>
+                        <p>Welcome to the Rainfall Prediction System. Our analysis indicates that there will be rainfall in {location_names.get(location, 'Unknown Location')} area on {next_day_str}.</p>
+                        <p>Please take necessary precautions while going outside.</p>
+                        <p>Thank you for using our service.</p>
+                        <p>Best regards</p>
+                    </body>
+                </html>
+                """
 
             msg = MIMEText(message,'html')
             msg['to'] = user_email
@@ -229,9 +266,11 @@ def predict():
         except HttpError as error:
             print(F'An error occurred: {error}')
             send_message = None
-        prediction_text = f"{greeting}, no rain expected.It is not likely to rain, you can enjoy the outing to your desired location with your family and friends." if pred[0] == 0 else f"{greeting}, rain expected.It is likely to rain,so you might want to consider bringing an umbrella or planning indoor activities."
-        
-    return render_template("predictor.html", prediction_text=prediction_text)
+        prediction_text = f"{greeting}, No rain expected.You can enjoy the outing to your desired location with your family and friends." if pred[0] == 0 else f"{greeting}, Rain expected.You might want to consider bringing an umbrella or planning indoor activities."
+     # Pass the current date to the template
+    current_date = date.today().strftime("%Y-%m-%d")   
+    return render_template("predictor.html", prediction_text=prediction_text, current_date=current_date)
+
 
 # # for email message
 CLIENT_ID = '620539546907-f31a9podppn69tqgm43k9j835scni076.apps.googleusercontent.com'
@@ -240,54 +279,7 @@ ACCESS_TOKEN = 'ya29.a0AfB_byBxsRQ-C0C_v_1XIwtbYlhyKoekYtzso5fQqwsBdwQ1qCKmyLVX-
 REFRESH_TOKEN = '1//0g-_vl0bPd-_HCgYIARAAGBASNwF-L9IrA9reVpSZOvRoG56oueQvaVFFpHqoILGAOI7kmULgqOdEisYNt6SnEwXmgnRYVZFGVyc'
 TOKEN_URI = 'https://oauth2.googleapis.com/token'
 
-# @ app.route("/email", methods=['GET', 'POST'])
-# def email():
-#     if request.method == "POST":
-#         try:
-#             # Create a credentials object from the access token and refresh token
-#             creds = Credentials(
-#                 ACCESS_TOKEN,
-#                 token_uri=TOKEN_URI,
-#                 refresh_token=REFRESH_TOKEN,
-#                 client_id=CLIENT_ID,
-#                 client_secret=CLIENT_SECRET)
-#             if creds and creds.expired and creds.refresh_token:
-#                 creds.refresh(Request())
 
-
-# # # Create a Gmail API service client
-#             service = build('gmail', 'v1', credentials=creds)
-
-#             to = request.form.getlist('receiver_email')
-#             if not request.form.get('receiver_email'):
-#                 email_error = "Enter the email for registration"
-#                 flash(email_error,"error")
-#                 return redirect('/email')
-            
-#             composed_message = session.get('composed_message', {})
-#             if not composed_message:
-#                 flash("No composed message found. Please try again.", "error")
-#                 return redirect('/email')
-#             subject = composed_message['subject']
-          
-#             msg = MIMEText(composed_message['message'])
-#             msg['to'] = to
-#             msg['subject'] = subject
-#             raw_message = base64.urlsafe_b64encode(
-#                 msg.as_bytes()).decode('utf-8')
-
-#             send_message = {'raw': raw_message}
-#             send_message = (service.users().messages().send(
-#                 userId="me", body=send_message).execute())
-#             print(
-#                 F'The email was sent to {to} with email Id: {send_message["id"]}')
-#             flash("Email sent successfully!", "success")
-#         except HttpError as error:
-#             print(F'An error occurred: {error}')
-          
-#             flash("Failed to send email. Please try again.", "error")
-
-#     return render_template('email.html')
 @app.route("/email", methods=['GET', 'POST'])
 def email():
     if request.method == "POST":
@@ -316,12 +308,12 @@ def email():
             if not composed_message:
                 flash("No composed message found. Please try again.", "error")
                 return redirect('/email')
+
             subject = composed_message['subject']
             user_email = session.get('email')
-            forward_notification =  f"This message was forwarded by {user_email}"
+            forward_notification = f"This message was forwarded by {user_email}"
             message_body = f"{composed_message['message']}\n\n{forward_notification}"
-            msg = MIMEText(message_body)
-          
+            msg = MIMEText(message_body, 'html')
             msg['subject'] = subject
 
             for receiver in receivers:
@@ -330,17 +322,19 @@ def email():
                     msg.as_bytes()).decode('utf-8')
 
                 send_message = {'raw': raw_message}
-                send_message = (service.users().messages().send(
-                    userId="me", body=send_message).execute())
+                send_message = service.users().messages().send(
+                    userId="me", body=send_message).execute()
                 print(
-                    F'The email was sent to {receiver} with email Id: {send_message["id"]}')
+                    f'The email was sent to {receiver} with email Id: {send_message["id"]}')
+
             flash("Emails sent successfully!", "success")
         except HttpError as error:
-            print(F'An error occurred: {error}')
+            print(f'An error occurred: {error}')
             flash("Failed to send emails. Please try again.", "error")
-
-    return render_template('email.html')
-
+        return redirect('/email')
+    elif request.method == "GET":
+        # Render the email form template
+        return render_template('email.html')
 
 @ app.route('/logout')
 def logout():
